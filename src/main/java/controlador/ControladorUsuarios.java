@@ -34,11 +34,10 @@ public class ControladorUsuarios {
                 String contraseña = doc.getString("contraseña");
 
                 if (contraseña != null && correo != null) {
-                    // Sanitizar correo
                     try {
                         correo = SanitizadorEntradas.sanitizarCorreo(correo);
                     } catch (IllegalArgumentException e) {
-                        logger.warning("Correo inválido en BD: " + correo);
+                        logger.log(Level.WARNING, "Correo inválido en BD, saltando usuario");
                         continue;
                     }
                     
@@ -48,20 +47,14 @@ public class ControladorUsuarios {
                 }
             }
 
-            logger.info("Usuarios cargados: " + usuarios.size());
+            logger.log(Level.INFO, "Usuarios cargados exitosamente: {0}", usuarios.size());
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error al cargar usuarios.");
             logger.log(Level.SEVERE, "Error al cargar usuarios", e);
+            JOptionPane.showMessageDialog(null, "Error al cargar usuarios.");
         }
     }
     
-    /**
-     * Verifica las credenciales de un usuario
-     * @param correo Correo ya sanitizado
-     * @param contraseña Contraseña en texto plano
-     * @return true si las credenciales son correctas
-     */
     public static boolean verificarCredenciales(String correo, String contraseña) {
         try {
             if (correo == null || contraseña == null) {
@@ -69,8 +62,6 @@ public class ControladorUsuarios {
             }
             
             MongoCollection<Document> collection = ConexionMongoDB.getCollection("usuarios");
-            
-            // Buscar usuario por correo (ya sanitizado)
             Document usuario = collection.find(eq("correo", correo)).first();
             
             if (usuario == null) {
@@ -78,8 +69,6 @@ public class ControladorUsuarios {
             }
             
             String contraseñaAlmacenada = usuario.getString("contraseña");
-            
-            // Verificar contraseña encriptada
             return Encriptacion.verificarContraseña(contraseña, contraseñaAlmacenada);
             
         } catch (Exception e) {
@@ -88,11 +77,6 @@ public class ControladorUsuarios {
         }
     }
     
-    /**
-     * Obtiene el rol de un usuario por su correo
-     * @param correo Correo ya sanitizado
-     * @return El rol del usuario o null si no existe
-     */
     public static String obtenerRolPorCorreo(String correo) {
         try {
             if (correo == null) {
@@ -100,8 +84,6 @@ public class ControladorUsuarios {
             }
             
             MongoCollection<Document> collection = ConexionMongoDB.getCollection("usuarios");
-            
-            // Buscar usuario por correo (ya sanitizado)
             Document usuario = collection.find(eq("correo", correo)).first();
             
             if (usuario == null) {
