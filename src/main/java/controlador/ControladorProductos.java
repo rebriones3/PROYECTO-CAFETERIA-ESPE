@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import static com.mongodb.client.model.Filters.*;
 import modelo.*;
+import util.HtmlEscapeUtil;
 
 public class ControladorProductos {
     private static final Logger logger = Logger.getLogger(ControladorProductos.class.getName());

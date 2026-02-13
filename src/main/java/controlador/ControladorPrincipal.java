@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import javax.swing.JFrame;
 import modelo.*;
 import vista.*;
+import util.HtmlEscapeUtil;
 
 public class ControladorPrincipal {
     private static final Logger logger = Logger.getLogger(ControladorPrincipal.class.getName());
@@ -130,7 +131,7 @@ public class ControladorPrincipal {
             AdministradorInterfaz ventanaAdministrador = new AdministradorInterfaz();
             ventanaAdministrador.setVisible(true);
         } else {
-            JOptionPane.showMessageDialog(null, "Rol no reconocido: " + rolActual);
+            JOptionPane.showMessageDialog(null, "Rol no reconocido: " + HtmlEscapeUtil.escapeHtml(rolActual));
         }
     }
     
@@ -175,7 +176,7 @@ public static boolean validarLoginAutomatico(String correo, String contraseña) 
             modelo.Rol rol = ControladorRolesAvanzados.obtenerRol(rolBD);
             if (rol == null || !rol.isActivo()) {
                 JOptionPane.showMessageDialog(null,
-                    "Su rol '" + rolBD + "' está inactivo.\n" +
+                    "Su rol '" + HtmlEscapeUtil.escapeHtml(rolBD) + "' está inactivo.\n" +
                     "Contacte al administrador del sistema.",
                     "Rol inactivo",
                     JOptionPane.ERROR_MESSAGE);

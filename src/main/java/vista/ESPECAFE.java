@@ -11,6 +11,7 @@ import controlador.ControladorNotificaciones;
 import org.bson.Document;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import util.HtmlEscapeUtil;
 
 public class ESPECAFE extends javax.swing.JFrame {
 
@@ -175,7 +176,7 @@ public class ESPECAFE extends javax.swing.JFrame {
         }
         if (producto == null) {
             JOptionPane.showMessageDialog(this,
-                    "El producto '" + nombre + "' no existe en el sistema.\n"
+                    "El producto '" + HtmlEscapeUtil.escapeHtml(nombre) + "' no existe en el sistema.\n"
                     + "Contacte al administrador para agregarlo.",
                     "Producto No Encontrado",
                     JOptionPane.ERROR_MESSAGE);
@@ -184,7 +185,7 @@ public class ESPECAFE extends javax.swing.JFrame {
         // Verificar disponibilidad
         if ("No".equalsIgnoreCase(producto.getDisponible())) {
             JOptionPane.showMessageDialog(this,
-                    "El producto " + nombre + " no está disponible actualmente.",
+                    "El producto " + HtmlEscapeUtil.escapeHtml(nombre) + " no está disponible actualmente.",
                     "Producto No Disponible",
                     JOptionPane.WARNING_MESSAGE);
             return;

@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import static com.mongodb.client.model.Filters.*;
 import modelo.*;
 import modelo.Encriptacion;
+import util.HtmlEscapeUtil;
 
 public class ControladorUsuarios {
     private static final Logger logger = Logger.getLogger(ControladorUsuarios.class.getName());
@@ -176,8 +177,8 @@ public class ControladorUsuarios {
             
             JOptionPane.showMessageDialog(null, 
                 "Usuario creado exitosamente.\n\n" +
-                "Rol: " + rol + "\n" +
-                "Correo: " + correo + "\n" +
+                "Rol: " + HtmlEscapeUtil.escapeHtml(rol) + "\n" +
+                "Correo: " + HtmlEscapeUtil.escapeHtml(correo) + "\n" +
                 "Contraseña: Encriptada y almacenada de forma segura",
                 "Usuario Creado",
                 JOptionPane.INFORMATION_MESSAGE);

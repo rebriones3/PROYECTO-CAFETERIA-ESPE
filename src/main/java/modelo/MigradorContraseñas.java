@@ -5,6 +5,7 @@ import org.bson.Document;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static com.mongodb.client.model.Filters.*;
+import util.HtmlEscapeUtil;
 
 public class MigradorContraseñas {
     private static final Logger logger = Logger.getLogger(MigradorContraseñas.class.getName());

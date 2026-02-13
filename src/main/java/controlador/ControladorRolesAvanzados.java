@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import static com.mongodb.client.model.Filters.*;
 import modelo.*;
+import util.HtmlEscapeUtil;
 
 public class ControladorRolesAvanzados {
     private static final Logger logger = Logger.getLogger(ControladorRolesAvanzados.class.getName());
@@ -65,7 +66,7 @@ public class ControladorRolesAvanzados {
             collection.insertOne(rolDoc);
             
             JOptionPane.showMessageDialog(null, 
-                "Rol '" + nombre + "' creado exitosamente con " + permisos.size() + " permisos.",
+                "Rol '" + HtmlEscapeUtil.escapeHtml(nombre) + "' creado exitosamente con " + permisos.size() + " permisos.",
                 "Rol Creado",
                 JOptionPane.INFORMATION_MESSAGE);
             
