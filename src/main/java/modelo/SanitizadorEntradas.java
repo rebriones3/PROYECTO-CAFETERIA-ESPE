@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
  */
 public class SanitizadorEntradas {
     
-    // Patrones de validación
     private static final Pattern PATRON_EMAIL = Pattern.compile(
         "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
     );
@@ -21,29 +20,22 @@ public class SanitizadorEntradas {
         "^[A-Za-zÁÉÍÓÚáéíóúÑñ\\s]{1,50}$"
     );
     
-    // Caracteres peligrosos para MongoDB
     private static final String[] CARACTERES_PELIGROSOS = {
         "$", "{", "}", "[", "]", "(", ")", "<", ">", 
         "\"", "'", "\\", "|", "&", ";", "`"
     };
     
-    /**
-     * Sanitiza un String removiendo caracteres potencialmente peligrosos
-     */
     public static String sanitizarTexto(String input) {
         if (input == null) {
             return "";
         }
         
-        // Eliminar espacios al inicio y final
         String sanitizado = input.trim();
         
-        // Limitar longitud máxima
         if (sanitizado.length() > 500) {
             sanitizado = sanitizado.substring(0, 500);
         }
         
-        // Remover caracteres peligrosos para NoSQL
         for (String caracter : CARACTERES_PELIGROSOS) {
             sanitizado = sanitizado.replace(caracter, "");
         }
@@ -51,9 +43,6 @@ public class SanitizadorEntradas {
         return sanitizado;
     }
     
-    /**
-     * Valida y sanitiza un correo electrónico
-     */
     public static String sanitizarCorreo(String correo) {
         if (correo == null || correo.trim().isEmpty()) {
             throw new IllegalArgumentException("El correo no puede estar vacío");
@@ -72,9 +61,6 @@ public class SanitizadorEntradas {
         return correoLimpio;
     }
     
-    /**
-     * Valida y sanitiza el nombre de un producto
-     */
     public static String sanitizarNombreProducto(String nombre) {
         if (nombre == null || nombre.trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre del producto no puede estar vacío");
@@ -93,9 +79,6 @@ public class SanitizadorEntradas {
         return nombreLimpio;
     }
     
-    /**
-     * Valida y sanitiza una categoría
-     */
     public static String sanitizarCategoria(String categoria) {
         if (categoria == null || categoria.trim().isEmpty()) {
             throw new IllegalArgumentException("La categoría no puede estar vacía");
@@ -110,9 +93,6 @@ public class SanitizadorEntradas {
         return categoriaLimpia;
     }
     
-    /**
-     * Valida un precio
-     */
     public static double validarPrecio(double precio) {
         if (precio < 0) {
             throw new IllegalArgumentException("El precio no puede ser negativo");
@@ -122,32 +102,24 @@ public class SanitizadorEntradas {
             throw new IllegalArgumentException("El precio es demasiado alto");
         }
         
-        // Redondear a 2 decimales
         return Math.round(precio * 100.0) / 100.0;
     }
     
-    /**
-     * Valida una disponibilidad
-     */
     public static String validarDisponibilidad(String disponible) {
         if (disponible == null || disponible.trim().isEmpty()) {
-            return "Si"; // Valor por defecto
+            return "Si";
         }
         
         String disponibleLimpio = disponible.trim();
         
         if (!disponibleLimpio.equalsIgnoreCase("Si") && 
             !disponibleLimpio.equalsIgnoreCase("No")) {
-            return "Si"; // Valor por defecto si es inválido
+            return "Si";
         }
         
         return disponibleLimpio;
     }
     
-    /**
-     * Escapa caracteres especiales para mensajes de usuario
-     * (útil para prevenir confusión en mensajes de error)
-     */
     public static String escaparParaMensaje(String mensaje) {
         if (mensaje == null) {
             return "";
