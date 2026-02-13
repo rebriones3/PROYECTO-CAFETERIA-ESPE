@@ -4,10 +4,13 @@ import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import javax.swing.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static com.mongodb.client.model.Filters.*;
 import modelo.*;
 
 public class ControladorRolesAvanzados {
+    private static final Logger logger = Logger.getLogger(ControladorRolesAvanzados.class.getName());
     
     /**
      * Crear rol personalizado con permisos específicos
@@ -73,7 +76,7 @@ public class ControladorRolesAvanzados {
                 "Error al crear rol: " + e.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error al crear rol personalizado", e);
             return false;
         }
     }
@@ -260,7 +263,7 @@ public class ControladorRolesAvanzados {
                 "Error al editar rol: " + e.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error al editar rol personalizado", e);
             return false;
         }
     }
@@ -309,7 +312,7 @@ public class ControladorRolesAvanzados {
                 "Error al eliminar rol: " + e.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error al eliminar rol personalizado", e);
             return false;
         }
     }

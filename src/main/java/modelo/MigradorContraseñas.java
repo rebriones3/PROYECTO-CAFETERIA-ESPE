@@ -2,9 +2,12 @@ package modelo;
 
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static com.mongodb.client.model.Filters.*;
 
 public class MigradorContraseñas {
+    private static final Logger logger = Logger.getLogger(MigradorContraseñas.class.getName());
     
     public static void migrarContraseñas() {
         try {
@@ -37,7 +40,7 @@ public class MigradorContraseñas {
             
         } catch (Exception e) {
             System.err.println("Error en migración: " + e.getMessage());
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error en migración de contraseñas", e);
         }
     }
     

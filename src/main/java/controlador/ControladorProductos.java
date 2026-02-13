@@ -6,10 +6,13 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static com.mongodb.client.model.Filters.*;
 import modelo.*;
 
 public class ControladorProductos {
+    private static final Logger logger = Logger.getLogger(ControladorProductos.class.getName());
     private static List<Producto> productos = new ArrayList<>();
     
     static {
@@ -55,7 +58,7 @@ public class ControladorProductos {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, 
                 "Error al cargar productos desde MongoDB: " + e.getMessage());
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error al cargar productos desde MongoDB", e);
         }
     }
     

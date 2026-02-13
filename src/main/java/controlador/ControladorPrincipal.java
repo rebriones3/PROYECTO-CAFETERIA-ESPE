@@ -4,11 +4,14 @@ import com.mongodb.client.*;
 import org.bson.Document;
 import javax.swing.JOptionPane;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import modelo.*;
 import vista.*;
 
 public class ControladorPrincipal {
+    private static final Logger logger = Logger.getLogger(ControladorPrincipal.class.getName());
     private static List<Usuario> usuarios = new ArrayList<>();
     private static String usuarioActual;
     private static String rolActual;
@@ -58,7 +61,7 @@ public class ControladorPrincipal {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, 
                 "Error al cargar usuarios desde MongoDB: " + e.getMessage());
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error al cargar usuarios desde MongoDB", e);
         }
     }
     
@@ -112,7 +115,7 @@ public class ControladorPrincipal {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, 
                 "Error al guardar el pedido en MongoDB: " + e.getMessage());
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error al guardar el pedido en MongoDB", e);
         }
     }
     
@@ -211,7 +214,7 @@ public static void navegarInterfazUnificada() {
             "Error al abrir la interfaz: " + e.getMessage(),
             "Error",
             JOptionPane.ERROR_MESSAGE);
-        e.printStackTrace();
+        logger.log(Level.SEVERE, "Error al abrir la interfaz unificada", e);
     }
 }
     public static void abrirLogin() {

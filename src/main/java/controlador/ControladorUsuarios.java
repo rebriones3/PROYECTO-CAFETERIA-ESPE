@@ -6,11 +6,14 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static com.mongodb.client.model.Filters.*;
 import modelo.*;
 import modelo.Encriptacion;
 
 public class ControladorUsuarios {
+    private static final Logger logger = Logger.getLogger(ControladorUsuarios.class.getName());
     private static List<Usuario> usuarios = new ArrayList<>();
     
     static {
@@ -60,7 +63,7 @@ public class ControladorUsuarios {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, 
                 "Error al cargar usuarios desde MongoDB: " + e.getMessage());
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error al cargar usuarios desde MongoDB", e);
         }
     }
     
@@ -105,7 +108,7 @@ public class ControladorUsuarios {
                 "Error al asignar rol en MongoDB: " + e.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error al asignar rol en MongoDB", e);
             return false;
         }
     }
@@ -186,7 +189,7 @@ public class ControladorUsuarios {
                 "Error al agregar usuario en MongoDB: " + e.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error al agregar usuario en MongoDB", e);
             return false;
         }
     }
@@ -236,7 +239,7 @@ public class ControladorUsuarios {
                 "Error al eliminar usuario de MongoDB: " + e.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error al eliminar usuario de MongoDB", e);
             return false;
         }
     }
@@ -305,7 +308,7 @@ public class ControladorUsuarios {
                 "Error al editar usuario en MongoDB: " + e.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error al editar usuario en MongoDB", e);
             return false;
         }
     }
