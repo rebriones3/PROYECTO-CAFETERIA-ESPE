@@ -29,23 +29,72 @@ public class ControladorUsuarios {
             modelo.setRowCount(0);
 
             for (Document doc : collection.find()) {
-                String rol = doc.getString("rol");
+                String rol = SanitizadorEntradas.sanitizarTexto(doc.getString("rol"));
                 String correo = doc.getString("correo");
                 String contraseña = doc.getString("contraseña");
 
-                if (contraseña != null) {
+                if (contraseña != null && correo != null) {
+                    try {
+                        correo = SanitizadorEntradas.sanitizarCorreo(correo);
+                    } catch (IllegalArgumentException e) {
+                        logger.log(Level.WARNING, "Correo inválido en BD, saltando usuario");
+                        continue;
+                    }
+                    
                     Usuario usuario = new Usuario(rol, correo, contraseña);
                     usuarios.add(usuario);
                     modelo.addRow(new Object[]{rol, correo, "********"});
                 }
             }
 
-            logger.info("Usuarios cargados: " + usuarios.size());
+            logger.log(Level.INFO, "Usuarios cargados exitosamente: {0}", usuarios.size());
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,"Error al cargar usuarios: " + e.getMessage());
-            logger.log(Level.SEVERE,"Error al cargar usuarios",e);
+            logger.log(Level.SEVERE, "Error al cargar usuarios", e);
+            JOptionPane.showMessageDialog(null, "Error al cargar usuarios.");
+        }
+    }
+    
+    public static boolean verificarCredenciales(String correo, String contraseña) {
+        try {
+            if (correo == null || contraseña == null) {
+                return false;
+            }
+            
+            MongoCollection<Document> collection = ConexionMongoDB.getCollection("usuarios");
+            Document usuario = collection.find(eq("correo", correo)).first();
+            
+            if (usuario == null) {
+                return false;
+            }
+            
+            String contraseñaAlmacenada = usuario.getString("contraseña");
+            return Encriptacion.verificarContraseña(contraseña, contraseñaAlmacenada);
+            
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error al verificar credenciales", e);
+            return false;
+        }
+    }
+    
+    public static String obtenerRolPorCorreo(String correo) {
+        try {
+            if (correo == null) {
+                return null;
+            }
+            
+            MongoCollection<Document> collection = ConexionMongoDB.getCollection("usuarios");
+            Document usuario = collection.find(eq("correo", correo)).first();
+            
+            if (usuario == null) {
+                return null;
+            }
+            
+            return SanitizadorEntradas.sanitizarTexto(usuario.getString("rol"));
+            
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error al obtener rol", e);
+            return null;
         }
     }
 }
-
