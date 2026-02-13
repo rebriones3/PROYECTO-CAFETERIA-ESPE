@@ -1,5 +1,6 @@
 package modelo;
 
+import com.mongodb.MongoException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
@@ -24,11 +25,17 @@ public class ConexionMongoDB {
             database.runCommand(new Document("ping", 1));
             System.out.println("Conexión a MongoDB establecida correctamente");
             
-        } catch (Exception e) {
-            System.err.println("Error al conectar con MongoDB: " + e.getMessage());
+        } catch (MongoException e) {
+            System.err.println("Error de MongoDB al conectar: " + e.getMessage());
             JOptionPane.showMessageDialog(null, 
-                "Error de conexión a la base de datos: " + e.getMessage(),
+                "Error de conexión a la base de datos MongoDB: " + e.getMessage(),
                 "Error de Conexión",
+                JOptionPane.ERROR_MESSAGE);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Error: cadena de conexión inválida: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, 
+                "Error: configuración de conexión inválida: " + e.getMessage(),
+                "Error de Configuración",
                 JOptionPane.ERROR_MESSAGE);
         }
     }

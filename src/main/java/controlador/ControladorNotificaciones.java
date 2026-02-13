@@ -1,5 +1,6 @@
 package controlador;
 
+import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import modelo.ConexionMongoDB;
@@ -21,8 +22,11 @@ public class ControladorNotificaciones {
             
             return (int) count;
             
-        } catch (Exception e) {
-            System.err.println("Error al contar notificaciones: " + e.getMessage());
+        } catch (MongoException e) {
+            System.err.println("Error de base de datos al contar notificaciones: " + e.getMessage());
+            return 0;
+        } catch (IllegalArgumentException e) {
+            System.err.println("Argumento inválido al contar notificaciones: " + e.getMessage());
             return 0;
         }
     }
@@ -42,8 +46,10 @@ public class ControladorNotificaciones {
                 notificaciones.add(doc);
             }
             
-        } catch (Exception e) {
-            System.err.println("Error al obtener notificaciones: " + e.getMessage());
+        } catch (MongoException e) {
+            System.err.println("Error de base de datos al obtener notificaciones: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.err.println("Argumento inválido al obtener notificaciones: " + e.getMessage());
         }
         
         return notificaciones;
@@ -58,8 +64,10 @@ public class ControladorNotificaciones {
                 new Document("$set", new Document("leida", true))
             );
             
-        } catch (Exception e) {
-            System.err.println("Error al marcar notificación como leída: " + e.getMessage());
+        } catch (MongoException e) {
+            System.err.println("Error de base de datos al marcar notificación como leída: " + e.getMessage());
+        } catch (NullPointerException e) {
+            System.err.println("Notificación nula al marcar como leída: " + e.getMessage());
         }
     }
     
@@ -75,8 +83,10 @@ public class ControladorNotificaciones {
                 new Document("$set", new Document("leida", true))
             );
             
-        } catch (Exception e) {
-            System.err.println("Error al marcar todas como leídas: " + e.getMessage());
+        } catch (MongoException e) {
+            System.err.println("Error de base de datos al marcar todas como leídas: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.err.println("Argumento inválido al marcar todas como leídas: " + e.getMessage());
         }
     }
 }

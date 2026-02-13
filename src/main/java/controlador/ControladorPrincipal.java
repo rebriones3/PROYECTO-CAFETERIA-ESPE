@@ -1,5 +1,6 @@
 package controlador;
 
+import com.mongodb.MongoException;
 import com.mongodb.client.*;
 import org.bson.Document;
 import javax.swing.JOptionPane;
@@ -55,9 +56,13 @@ public class ControladorPrincipal {
             
             System.out.println("Usuarios cargados: " + usuarios.size());
             
-        } catch (Exception e) {
+        } catch (MongoException e) {
             JOptionPane.showMessageDialog(null, 
-                "Error al cargar usuarios desde MongoDB: " + e.getMessage());
+                "Error de base de datos al cargar usuarios: " + e.getMessage());
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            JOptionPane.showMessageDialog(null, 
+                "Error: datos nulos al cargar usuarios: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -109,9 +114,13 @@ public class ControladorPrincipal {
 
             JOptionPane.showMessageDialog(null, "Pedido guardado exitosamente!");
 
-        } catch (Exception e) {
+        } catch (MongoException e) {
             JOptionPane.showMessageDialog(null, 
-                "Error al guardar el pedido en MongoDB: " + e.getMessage());
+                "Error de base de datos al guardar el pedido: " + e.getMessage());
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(null, 
+                "Error: datos inválidos en el pedido: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -144,7 +153,6 @@ public class ControladorPrincipal {
         rolActual = null;
         abrirLogin();
     }
-    // AGREGAR ESTOS MÉTODOS A ControladorPrincipal.java
 
 /**
  * Validar login automático (sin seleccionar rol manualmente)
@@ -206,14 +214,21 @@ public static void navegarInterfazUnificada() {
         InterfazUnificada interfazUnificada = new InterfazUnificada(usuarioActual, rol);
         interfazUnificada.setVisible(true);
         
-    } catch (Exception e) {
+    } catch (NullPointerException e) {
         JOptionPane.showMessageDialog(null, 
-            "Error al abrir la interfaz: " + e.getMessage(),
+            "Error: datos nulos al abrir la interfaz: " + e.getMessage(),
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    } catch (IllegalArgumentException e) {
+        JOptionPane.showMessageDialog(null, 
+            "Error: argumentos inválidos al abrir la interfaz: " + e.getMessage(),
             "Error",
             JOptionPane.ERROR_MESSAGE);
         e.printStackTrace();
     }
 }
+
     public static void abrirLogin() {
         JFrame frameLogin = new JFrame("Cafetería ESPE - Login");
         frameLogin.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
