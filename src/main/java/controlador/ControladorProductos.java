@@ -1,5 +1,6 @@
 package controlador;
 
+import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import javax.swing.*;
@@ -52,9 +53,17 @@ public class ControladorProductos {
 
             System.out.println("Productos cargados: " + productos.size());
 
-        } catch (Exception e) {
+        } catch (MongoException e) {
             JOptionPane.showMessageDialog(null, 
-                "Error al cargar productos desde MongoDB: " + e.getMessage());
+                "Error de base de datos al cargar productos: " + e.getMessage());
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            JOptionPane.showMessageDialog(null, 
+                "Error: datos nulos al cargar productos: " + e.getMessage());
+            e.printStackTrace();
+        } catch (ClassCastException e) {
+            JOptionPane.showMessageDialog(null, 
+                "Error: tipo de dato incorrecto en productos: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -92,9 +101,13 @@ public class ControladorProductos {
             
             return true;
             
-        } catch (Exception e) {
+        } catch (MongoException e) {
             JOptionPane.showMessageDialog(null, 
-                "Error al agregar producto en MongoDB: " + e.getMessage());
+                "Error de base de datos al agregar producto: " + e.getMessage());
+            return false;
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(null, 
+                "Error: datos inválidos al agregar producto: " + e.getMessage());
             return false;
         }
     }
@@ -135,9 +148,13 @@ public class ControladorProductos {
 
             return true;
 
-        } catch (Exception e) {
+        } catch (MongoException e) {
             JOptionPane.showMessageDialog(null, 
-                "Error al editar producto en MongoDB: " + e.getMessage());
+                "Error de base de datos al editar producto: " + e.getMessage());
+            return false;
+        } catch (IndexOutOfBoundsException e) {
+            JOptionPane.showMessageDialog(null, 
+                "Error: índice de producto inválido: " + e.getMessage());
             return false;
         }
     }
@@ -160,9 +177,13 @@ public class ControladorProductos {
             
             return true;
 
-        } catch (Exception e) {
+        } catch (MongoException e) {
             JOptionPane.showMessageDialog(null, 
-                "Error al eliminar producto de MongoDB: " + e.getMessage());
+                "Error de base de datos al eliminar producto: " + e.getMessage());
+            return false;
+        } catch (IndexOutOfBoundsException e) {
+            JOptionPane.showMessageDialog(null, 
+                "Error: índice de producto inválido: " + e.getMessage());
             return false;
         }
     }
