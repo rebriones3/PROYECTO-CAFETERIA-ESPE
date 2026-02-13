@@ -7,10 +7,13 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static com.mongodb.client.model.Filters.*;
 import modelo.*;
 
 public class ControladorProductos {
+    private static final Logger logger = Logger.getLogger(ControladorProductos.class.getName());
     private static List<Producto> productos = new ArrayList<>();
     
     static {
@@ -33,7 +36,7 @@ public class ControladorProductos {
                 } else if (precioObj instanceof Double) {
                     precio = (Double) precioObj;
                 } else {
-                    System.err.println("Tipo de precio no válido para: " + nombre);
+                    logger.log(Level.WARNING, "Tipo de precio no válido para producto: {0}", nombre);
                     continue; 
                 }
                 
@@ -52,28 +55,26 @@ public class ControladorProductos {
                 });
             }
 
-            System.out.println("Productos cargados: " + productos.size());
+            logger.log(Level.INFO, "Productos cargados exitosamente: {0}", productos.size());
 
         } catch (MongoException e) {
+            logger.log(Level.SEVERE, "Error de MongoDB al cargar productos", e);
             JOptionPane.showMessageDialog(null, 
                 "Error de base de datos al cargar productos.");
-            e.printStackTrace();
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error general al cargar productos", e);
             JOptionPane.showMessageDialog(null, 
                 "Error al cargar productos.");
-            e.printStackTrace();
         }
     }
     
     public static boolean agregarProducto(String nombre, double precio, String categoria, String disponible) {
         try {
-            // Validar y sanitizar todas las entradas
             String nombreSanitizado = SanitizadorEntradas.sanitizarNombreProducto(nombre);
             String categoriaSanitizada = SanitizadorEntradas.sanitizarCategoria(categoria);
             double precioValidado = SanitizadorEntradas.validarPrecio(precio);
             String disponibleValidado = SanitizadorEntradas.validarDisponibilidad(disponible);
             
-            // Verificar si el producto ya existe
             for (Producto p : productos) {
                 if (p.getNombre().equalsIgnoreCase(nombreSanitizado)) {
                     JOptionPane.showMessageDialog(null, "Este producto ya existe.");
@@ -92,24 +93,27 @@ public class ControladorProductos {
             
             collection.insertOne(producto);
             
-            // Actualizar lista local
             Producto nuevoProducto = new Producto(nombreSanitizado, precioValidado, categoriaSanitizada, "Mediano");
             nuevoProducto.setDisponible(disponibleValidado);
             productos.add(nuevoProducto);
             
+            logger.log(Level.INFO, "Producto agregado: {0}", nombreSanitizado);
             return true;
             
         } catch (IllegalArgumentException e) {
+            logger.log(Level.WARNING, "Validación fallida al agregar producto: {0}", e.getMessage());
             JOptionPane.showMessageDialog(null, 
                 "Error de validación: " + e.getMessage(),
                 "Error de validación",
                 JOptionPane.WARNING_MESSAGE);
             return false;
         } catch (MongoException e) {
+            logger.log(Level.SEVERE, "Error de MongoDB al agregar producto", e);
             JOptionPane.showMessageDialog(null, 
                 "Error de base de datos al agregar producto.");
             return false;
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error general al agregar producto", e);
             JOptionPane.showMessageDialog(null, 
                 "Error al agregar producto.");
             return false;
@@ -123,7 +127,6 @@ public class ControladorProductos {
         }
 
         try {
-            // Validar y sanitizar todas las entradas
             String nombreSanitizado = SanitizadorEntradas.sanitizarNombreProducto(nombre);
             String categoriaSanitizada = SanitizadorEntradas.sanitizarCategoria(categoria);
             double precioValidado = SanitizadorEntradas.validarPrecio(precio);
@@ -132,7 +135,6 @@ public class ControladorProductos {
             Producto productoViejo = productos.get(indice);
             MongoCollection<Document> collection = ConexionMongoDB.getCollection("productos");
             
-            // Actualizar en MongoDB
             collection.updateOne(
                 eq("nombre", productoViejo.getNombre()),
                 new Document("$set", 
@@ -144,26 +146,29 @@ public class ControladorProductos {
                 )
             );
 
-            // Actualizar lista local
             Producto producto = productos.get(indice);
             producto.setNombre(nombreSanitizado);
             producto.setPrecio(precioValidado);
             producto.setCategoria(categoriaSanitizada);
             producto.setDisponible(disponibleValidado);
 
+            logger.log(Level.INFO, "Producto editado: {0}", nombreSanitizado);
             return true;
 
         } catch (IllegalArgumentException e) {
+            logger.log(Level.WARNING, "Validación fallida al editar producto: {0}", e.getMessage());
             JOptionPane.showMessageDialog(null, 
                 "Error de validación: " + e.getMessage(),
                 "Error de validación",
                 JOptionPane.WARNING_MESSAGE);
             return false;
         } catch (MongoException e) {
+            logger.log(Level.SEVERE, "Error de MongoDB al editar producto", e);
             JOptionPane.showMessageDialog(null, 
                 "Error de base de datos al editar producto.");
             return false;
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error general al editar producto", e);
             JOptionPane.showMessageDialog(null, 
                 "Error al editar producto.");
             return false;
@@ -180,19 +185,19 @@ public class ControladorProductos {
             String nombreProducto = productos.get(indice).getNombre();
             MongoCollection<Document> collection = ConexionMongoDB.getCollection("productos");
             
-            // Eliminar de MongoDB
             collection.deleteOne(eq("nombre", nombreProducto));
-            
-            // Eliminar de lista local
             productos.remove(indice);
             
+            logger.log(Level.INFO, "Producto eliminado: {0}", nombreProducto);
             return true;
 
         } catch (MongoException e) {
+            logger.log(Level.SEVERE, "Error de MongoDB al eliminar producto", e);
             JOptionPane.showMessageDialog(null, 
                 "Error de base de datos al eliminar producto.");
             return false;
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error general al eliminar producto", e);
             JOptionPane.showMessageDialog(null, 
                 "Error al eliminar producto.");
             return false;
