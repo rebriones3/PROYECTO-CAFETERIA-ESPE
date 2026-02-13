@@ -105,7 +105,6 @@ public class ControladorPedido {
                     new Document("$set", new Document("estado", nuevoEstado))
             );
 
-            // ⭐ NUEVA FUNCIONALIDAD: Si el estado cambia a "Listo", notificar al estudiante
             if ("Listo".equalsIgnoreCase(nuevoEstado)) {
                 notificarEstudiantePedidoListo(pedido.getEstudiante(), pedido.getProductos());
                 System.out.println("Notificación enviada a " + pedido.getEstudiante());
@@ -139,7 +138,7 @@ public class ControladorPedido {
 
             collection.insertOne(notificacion);
 
-            System.out.println("✅ Notificación creada para: " + estudiante);
+            System.out.println("Notificación creada para: " + estudiante);
 
         } catch (MongoException e) {
             System.err.println("Error de base de datos al crear notificación: " + e.getMessage());
