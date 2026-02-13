@@ -1,0 +1,10 @@
+target/
+bin/
+dist/
+build/
+nbproject/private/
+*.class
+*.log
+.classpath
+.project
+.settings/

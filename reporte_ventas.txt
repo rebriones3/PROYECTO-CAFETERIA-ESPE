@@ -1,0 +1,10 @@
+REPORTE DE VENTAS - CAFETERÍA ESPE
+==================================
+
+DATOS:
+-------------
+Total de Pedidos: 1
+Pedidos Entregados: 1
+Pedidos Pendientes: 0
+Total de Ventas: $2,35
+Promedio por Pedido: $2,35
