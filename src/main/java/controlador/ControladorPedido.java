@@ -1,5 +1,6 @@
 package controlador;
 
+import com.mongodb.MongoException;
 import com.mongodb.client.*;
 import org.bson.Document;
 import javax.swing.*;
@@ -35,8 +36,10 @@ public class ControladorPedido {
                 pedidos.add(pedido);
                 modelo.addRow(new Object[]{estudiante, productos, total, estado});
             }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error al cargar pedidos: " + e.getMessage());
+        } catch (MongoException e) {
+            JOptionPane.showMessageDialog(null, "Error de base de datos al cargar pedidos: " + e.getMessage());
+        } catch (NullPointerException e) {
+            JOptionPane.showMessageDialog(null, "Error: datos nulos al cargar pedidos: " + e.getMessage());
         }
     }
 
@@ -61,43 +64,15 @@ public class ControladorPedido {
             pedidos.remove(filaSeleccionada);
             return true;
 
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error al actualizar pedido: " + e.getMessage());
+        } catch (MongoException e) {
+            JOptionPane.showMessageDialog(null, "Error de base de datos al actualizar pedido: " + e.getMessage());
+            return false;
+        } catch (IndexOutOfBoundsException e) {
+            JOptionPane.showMessageDialog(null, "Error: índice de pedido inválido: " + e.getMessage());
             return false;
         }
     }
 
-    /*
-    public static boolean cambiarEstadoPedido(int filaSeleccionada, String nuevoEstado) {
-        if (filaSeleccionada < 0 || filaSeleccionada >= pedidos.size()) {
-            JOptionPane.showMessageDialog(null, "Por favor, seleccione un pedido de la tabla.");
-            return false;
-        }
-
-        try {
-            Pedido pedido = pedidos.get(filaSeleccionada);
-            pedido.setEstado(nuevoEstado);
-
-            MongoCollection<Document> collection = ConexionMongoDB.getCollection("pedidos");
-
-            collection.updateOne(
-                    and(
-                            eq("estudiante", pedido.getEstudiante()),
-                            eq("productos", pedido.getProductos()),
-                            eq("codigoTransaccion", pedido.getCodigoTransaccion())
-                    ),
-                    new Document("$set", new Document("estado", nuevoEstado))
-            );
-
-            return true;
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,
-                    "Error al actualizar estado en MongoDB: " + e.getMessage());
-            return false;
-        }
-    }
-     */
     public static List<Pedido> getPedidos() {
         return new ArrayList<>(pedidos);
     }
@@ -138,9 +113,13 @@ public class ControladorPedido {
 
             return true;
 
-        } catch (Exception e) {
+        } catch (MongoException e) {
             JOptionPane.showMessageDialog(null,
-                    "Error al actualizar estado en MongoDB: " + e.getMessage());
+                    "Error de base de datos al actualizar estado: " + e.getMessage());
+            return false;
+        } catch (IndexOutOfBoundsException e) {
+            JOptionPane.showMessageDialog(null,
+                    "Error: índice de pedido inválido: " + e.getMessage());
             return false;
         }
     }
@@ -162,8 +141,11 @@ public class ControladorPedido {
 
             System.out.println("✅ Notificación creada para: " + estudiante);
 
-        } catch (Exception e) {
-            System.err.println("Error al crear notificación: " + e.getMessage());
+        } catch (MongoException e) {
+            System.err.println("Error de base de datos al crear notificación: " + e.getMessage());
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            System.err.println("Datos inválidos al crear notificación: " + e.getMessage());
             e.printStackTrace();
         }
     }
