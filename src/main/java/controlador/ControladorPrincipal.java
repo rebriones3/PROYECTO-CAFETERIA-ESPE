@@ -14,7 +14,6 @@ public class ControladorPrincipal {
     private static String rolActual;
     
     static {
-        // Inicializar conexión MongoDB
         ConexionMongoDB.conectar();
         cargarUsuarios();
     }
@@ -25,13 +24,9 @@ public class ControladorPrincipal {
             usuarios.clear();
             
             for (Document doc : collection.find()) {
-                // DEBUG: Mostrar todos los campos del documento
-                System.out.println("Documento completo: " + doc.toJson());
-                
                 String rol = doc.getString("rol");
                 String correo = doc.getString("correo");
                 
-                // Intentar diferentes nombres de campo para la contraseña
                 String contraseña = null;
                 if (doc.containsKey("contraseña")) {
                     contraseña = doc.getString("contraseña");
@@ -43,8 +38,8 @@ public class ControladorPrincipal {
                     contraseña = doc.getString("clave");
                 }
                 
-                // DEBUG: Verificar valores
-                System.out.println("Rol: " + rol + ", Correo: " + correo + ", Contraseña: " + contraseña);
+                // NO imprimir contraseñas en logs
+                System.out.println("Usuario cargado - Rol: " + rol + ", Correo: " + correo);
                 
                 if (contraseña != null) {
                     usuarios.add(new Usuario(rol, correo, contraseña));
@@ -53,7 +48,7 @@ public class ControladorPrincipal {
                 }
             }
             
-            System.out.println("Usuarios cargados: " + usuarios.size());
+            System.out.println("Total usuarios cargados: " + usuarios.size());
             
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, 
@@ -73,9 +68,7 @@ public class ControladorPrincipal {
             return false;
         }
 
-        // Usar el nuevo método de verificación con encriptación
         if (ControladorUsuarios.verificarCredenciales(correo, contraseña)) {
-            // Obtener el rol del usuario desde la base de datos
             String rolBD = ControladorUsuarios.obtenerRolPorCorreo(correo);
 
             if (rolBD != null && rolBD.equalsIgnoreCase(rol)) {
@@ -144,76 +137,66 @@ public class ControladorPrincipal {
         rolActual = null;
         abrirLogin();
     }
-    // AGREGAR ESTOS MÉTODOS A ControladorPrincipal.java
 
-/**
- * Validar login automático (sin seleccionar rol manualmente)
-     * @param correo
-     * @param contraseña
- */
-public static boolean validarLoginAutomatico(String correo, String contraseña) {
-    if (correo.isEmpty() || contraseña.isEmpty()) {
-        JOptionPane.showMessageDialog(null, "Por favor, ingrese su correo y contraseña.");
-        return false;
-    }
-
-    if (!correo.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-        JOptionPane.showMessageDialog(null, "Por favor, ingrese un correo válido.");
-        return false;
-    }
-
-    // Verificar credenciales
-    if (ControladorUsuarios.verificarCredenciales(correo, contraseña)) {
-        // Obtener el rol automáticamente
-        String rolBD = ControladorUsuarios.obtenerRolPorCorreo(correo);
-
-        if (rolBD != null) {
-            // Verificar que el rol esté activo
-            modelo.Rol rol = ControladorRolesAvanzados.obtenerRol(rolBD);
-            if (rol == null || !rol.isActivo()) {
-                JOptionPane.showMessageDialog(null,
-                    "Su rol '" + rolBD + "' está inactivo.\n" +
-                    "Contacte al administrador del sistema.",
-                    "Rol inactivo",
-                    JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-            
-            usuarioActual = correo;
-            rolActual = rolBD;
-            return true;
-        } else {
-            JOptionPane.showMessageDialog(null, "No se pudo identificar el rol del usuario.");
+    public static boolean validarLoginAutomatico(String correo, String contraseña) {
+        if (correo.isEmpty() || contraseña.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Por favor, ingrese su correo y contraseña.");
             return false;
         }
-    }
 
-    JOptionPane.showMessageDialog(null, "Correo o contraseña incorrectos.");
-    return false;
-}
-
-public static void navegarInterfazUnificada() {
-    try {
-        // Obtener permisos del usuario actual
-        modelo.Rol rol = ControladorRolesAvanzados.obtenerRol(rolActual);
-        
-        if (rol == null) {
-            JOptionPane.showMessageDialog(null, "Error: No se encontró el rol asignado.");
-            return;
+        if (!correo.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            JOptionPane.showMessageDialog(null, "Por favor, ingrese un correo válido.");
+            return false;
         }
-        
-        // Abrir la interfaz unificada con los permisos del rol
-        InterfazUnificada interfazUnificada = new InterfazUnificada(usuarioActual, rol);
-        interfazUnificada.setVisible(true);
-        
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(null, 
-            "Error al abrir la interfaz: " + e.getMessage(),
-            "Error",
-            JOptionPane.ERROR_MESSAGE);
-        e.printStackTrace();
+
+        if (ControladorUsuarios.verificarCredenciales(correo, contraseña)) {
+            String rolBD = ControladorUsuarios.obtenerRolPorCorreo(correo);
+
+            if (rolBD != null) {
+                modelo.Rol rol = ControladorRolesAvanzados.obtenerRol(rolBD);
+                if (rol == null || !rol.isActivo()) {
+                    JOptionPane.showMessageDialog(null,
+                        "Su rol '" + rolBD + "' está inactivo.\n" +
+                        "Contacte al administrador del sistema.",
+                        "Rol inactivo",
+                        JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
+                
+                usuarioActual = correo;
+                rolActual = rolBD;
+                return true;
+            } else {
+                JOptionPane.showMessageDialog(null, "No se pudo identificar el rol del usuario.");
+                return false;
+            }
+        }
+
+        JOptionPane.showMessageDialog(null, "Correo o contraseña incorrectos.");
+        return false;
     }
-}
+
+    public static void navegarInterfazUnificada() {
+        try {
+            modelo.Rol rol = ControladorRolesAvanzados.obtenerRol(rolActual);
+            
+            if (rol == null) {
+                JOptionPane.showMessageDialog(null, "Error: No se encontró el rol asignado.");
+                return;
+            }
+            
+            InterfazUnificada interfazUnificada = new InterfazUnificada(usuarioActual, rol);
+            interfazUnificada.setVisible(true);
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, 
+                "Error al abrir la interfaz: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+    
     public static void abrirLogin() {
         JFrame frameLogin = new JFrame("Cafetería ESPE - Login");
         frameLogin.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
