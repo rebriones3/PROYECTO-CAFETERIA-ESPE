@@ -1,5 +1,6 @@
 package controlador;
 
+import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import javax.swing.*;
@@ -57,9 +58,13 @@ public class ControladorUsuarios {
             
             System.out.println("Usuarios cargados: " + usuarios.size());
 
-        } catch (Exception e) {
+        } catch (MongoException e) {
             JOptionPane.showMessageDialog(null, 
-                "Error al cargar usuarios desde MongoDB: " + e.getMessage());
+                "Error de base de datos al cargar usuarios: " + e.getMessage());
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            JOptionPane.showMessageDialog(null, 
+                "Error: datos nulos al cargar usuarios: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -100,9 +105,16 @@ public class ControladorUsuarios {
 
             return true;
 
-        } catch (Exception e) {
+        } catch (MongoException e) {
             JOptionPane.showMessageDialog(null, 
-                "Error al asignar rol en MongoDB: " + e.getMessage(),
+                "Error de base de datos al asignar rol: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+            return false;
+        } catch (IndexOutOfBoundsException e) {
+            JOptionPane.showMessageDialog(null, 
+                "Error: índice de usuario inválido: " + e.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
@@ -181,9 +193,16 @@ public class ControladorUsuarios {
             
             return true;
             
-        } catch (Exception e) {
+        } catch (MongoException e) {
             JOptionPane.showMessageDialog(null, 
-                "Error al agregar usuario en MongoDB: " + e.getMessage(),
+                "Error de base de datos al agregar usuario: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+            return false;
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(null, 
+                "Error: datos inválidos al agregar usuario: " + e.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
@@ -231,9 +250,16 @@ public class ControladorUsuarios {
             
             return true;
 
-        } catch (Exception e) {
+        } catch (MongoException e) {
             JOptionPane.showMessageDialog(null, 
-                "Error al eliminar usuario de MongoDB: " + e.getMessage(),
+                "Error de base de datos al eliminar usuario: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+            return false;
+        } catch (IndexOutOfBoundsException e) {
+            JOptionPane.showMessageDialog(null, 
+                "Error: índice de usuario inválido: " + e.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
@@ -300,9 +326,16 @@ public class ControladorUsuarios {
             
             return true;
 
-        } catch (Exception e) {
+        } catch (MongoException e) {
             JOptionPane.showMessageDialog(null, 
-                "Error al editar usuario en MongoDB: " + e.getMessage(),
+                "Error de base de datos al editar usuario: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+            return false;
+        } catch (IndexOutOfBoundsException e) {
+            JOptionPane.showMessageDialog(null, 
+                "Error: índice de usuario inválido: " + e.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
@@ -343,8 +376,11 @@ public class ControladorUsuarios {
             }
             return false;
             
-        } catch (Exception e) {
-            System.err.println("Error al verificar credenciales: " + e.getMessage());
+        } catch (MongoException e) {
+            System.err.println("Error de base de datos al verificar credenciales: " + e.getMessage());
+            return false;
+        } catch (NullPointerException e) {
+            System.err.println("Error: datos nulos al verificar credenciales: " + e.getMessage());
             return false;
         }
     }
@@ -362,8 +398,11 @@ public class ControladorUsuarios {
             }
             return null;
             
-        } catch (Exception e) {
-            System.err.println("Error al obtener rol: " + e.getMessage());
+        } catch (MongoException e) {
+            System.err.println("Error de base de datos al obtener rol: " + e.getMessage());
+            return null;
+        } catch (NullPointerException e) {
+            System.err.println("Error: datos nulos al obtener rol: " + e.getMessage());
             return null;
         }
     }

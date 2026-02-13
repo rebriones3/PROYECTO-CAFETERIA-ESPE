@@ -4,6 +4,7 @@
  */
 package controlador;
 
+import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import java.util.Date;
 import modelo.ConexionMongoDB;
@@ -34,8 +35,12 @@ public class ControladorCalificaciones {
             System.out.println("✅ Calificación guardada: " + calificacion + " estrellas");
             return true;
             
-        } catch (Exception e) {
-            System.err.println("Error al guardar calificación: " + e.getMessage());
+        } catch (MongoException e) {
+            System.err.println("Error de base de datos al guardar calificación: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } catch (IllegalArgumentException e) {
+            System.err.println("Datos inválidos al guardar calificación: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -62,8 +67,11 @@ public class ControladorCalificaciones {
             
             return sumaCalificaciones / totalCalificaciones;
             
-        } catch (Exception e) {
-            System.err.println("Error al obtener promedio: " + e.getMessage());
+        } catch (MongoException e) {
+            System.err.println("Error de base de datos al obtener promedio: " + e.getMessage());
+            return 0;
+        } catch (NullPointerException e) {
+            System.err.println("Datos nulos al obtener promedio: " + e.getMessage());
             return 0;
         }
     }
@@ -84,8 +92,10 @@ public class ControladorCalificaciones {
                 }
             }
             
-        } catch (Exception e) {
-            System.err.println("Error al contar calificaciones: " + e.getMessage());
+        } catch (MongoException e) {
+            System.err.println("Error de base de datos al contar calificaciones: " + e.getMessage());
+        } catch (NullPointerException e) {
+            System.err.println("Datos nulos al contar calificaciones: " + e.getMessage());
         }
         
         return conteo;

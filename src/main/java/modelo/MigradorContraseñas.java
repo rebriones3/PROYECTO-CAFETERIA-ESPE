@@ -1,5 +1,6 @@
 package modelo;
 
+import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import static com.mongodb.client.model.Filters.*;
@@ -10,6 +11,7 @@ public class MigradorContraseñas {
         try {
             MongoCollection<Document> collection = ConexionMongoDB.getCollection("usuarios");
             int contador = 0;
+            
             for (Document doc : collection.find()) {
                 if (doc.containsKey("contraseña")) {
                     String contraseñaTextoPlano = doc.getString("contraseña");
@@ -18,25 +20,37 @@ public class MigradorContraseñas {
                         !contraseñaTextoPlano.isEmpty() && 
                         !contraseñaTextoPlano.startsWith("********") &&
                         contraseñaTextoPlano.length() < 50) { 
-                        // Encriptar la contraseña
-                        String contraseñaEncriptada = Encriptacion.encriptarContraseña(contraseñaTextoPlano);
-                        // Actualizar el documento
-                        collection.updateOne(
-                            eq("_id", doc.getObjectId("_id")),
-                            new Document("$set", 
-                                new Document("contraseña", contraseñaEncriptada)
-                            )
-                        );
                         
-                        System.out.println("Usuario migrado: " + doc.getString("correo"));
-                        contador++;
+                        try {
+                            // Encriptar la contraseña
+                            String contraseñaEncriptada = Encriptacion.encriptarContraseña(contraseñaTextoPlano);
+                            
+                            // Actualizar el documento
+                            collection.updateOne(
+                                eq("_id", doc.getObjectId("_id")),
+                                new Document("$set", 
+                                    new Document("contraseña", contraseñaEncriptada)
+                                )
+                            );
+                            
+                            System.out.println("Usuario migrado: " + doc.getString("correo"));
+                            contador++;
+                            
+                        } catch (IllegalArgumentException | IllegalStateException e) {
+                            System.err.println("Error al encriptar contraseña para usuario " + 
+                                doc.getString("correo") + ": " + e.getMessage());
+                        }
                     }
                 }
             }
+            
             System.out.println("Migración completada. " + contador + " usuarios actualizados.");
             
-        } catch (Exception e) {
-            System.err.println("Error en migración: " + e.getMessage());
+        } catch (MongoException e) {
+            System.err.println("Error de base de datos en migración: " + e.getMessage());
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            System.err.println("Error: datos nulos en migración: " + e.getMessage());
             e.printStackTrace();
         }
     }
