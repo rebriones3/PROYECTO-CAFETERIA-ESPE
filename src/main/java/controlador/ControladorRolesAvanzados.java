@@ -60,6 +60,9 @@ public class ControladorRolesAvanzados {
 
             collection.insertOne(rolDoc);
 
+            logger.log(Level.INFO, "Rol personalizado creado: {0} con {1} permisos", 
+                new Object[]{nombre, permisos.size()});
+
             JOptionPane.showMessageDialog(null,
                     "Rol '" + nombre + "' creado exitosamente con " + permisos.size() + " permisos.",
                     "Rol Creado",
@@ -68,20 +71,38 @@ public class ControladorRolesAvanzados {
             return true;
 
         } catch (MongoException e) {
+            logger.log(Level.SEVERE, "Error de MongoDB al crear rol personalizado", e);
             JOptionPane.showMessageDialog(null,
-                    "Error de base de datos al crear rol: " + e.getMessage(),
+                    "Error de base de datos al crear rol.",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
-            logger.log(Level.SEVERE, "Error de base de datos al crear rol", e);
             return false;
         } catch (IllegalArgumentException e) {
+            logger.log(Level.WARNING, "Datos inválidos al crear rol: {0}", e.getMessage());
             JOptionPane.showMessageDialog(null,
-                    "Error: datos inválidos al crear rol: " + e.getMessage(),
+                    "Error: datos inválidos al crear rol.",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
-            logger.log(Level.SEVERE, "Datos inválidos al crear rol", e);
             return false;
         }
     }
+    
+    public static Rol obtenerRol(String nombreRol) {
+        try {
+            MongoCollection<Document> collection = ConexionMongoDB.getCollection("roles_personalizados");
+            Document rolDoc = collection.find(eq("nombre", nombreRol)).first();
+            
+            if (rolDoc == null) {
+                // Rol predeterminado
+                return new Rol(nombreRol, true);
+            }
+            
+            boolean activo = rolDoc.getBoolean("activo", true);
+            return new Rol(nombreRol, activo);
+            
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error al obtener rol: " + nombreRol, e);
+            return null;
+        }
+    }
 }
-
