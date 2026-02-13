@@ -12,14 +12,17 @@ public class ConexionMongoDB {
     private static MongoClient mongoClient;
     private static MongoDatabase database;
     
-    // Configuración de conexión
-    private static final String CONNECTION_STRING = "mongodb://localhost:27017";
-    private static final String DATABASE_NAME = "cafeteria_espe";
-    
     public static void conectar() {
         try {
-            mongoClient = MongoClients.create(CONNECTION_STRING);
-            database = mongoClient.getDatabase(DATABASE_NAME);
+            // Cargar configuración desde variables de entorno
+            ConfiguracionSegura.cargarConfiguracion();
+            
+            // Obtener cadena de conexión de forma segura
+            String connectionString = ConfiguracionSegura.getMongoDBConnectionString();
+            String databaseName = ConfiguracionSegura.getMongoDBDatabase();
+            
+            mongoClient = MongoClients.create(connectionString);
+            database = mongoClient.getDatabase(databaseName);
             
             // Verificar conexión
             database.runCommand(new Document("ping", 1));
