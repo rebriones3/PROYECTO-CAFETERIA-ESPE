@@ -1,5 +1,6 @@
 package controlador;
 
+import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import javax.swing.*;
@@ -68,9 +69,16 @@ public class ControladorRolesAvanzados {
             
             return true;
             
-        } catch (Exception e) {
+        } catch (MongoException e) {
             JOptionPane.showMessageDialog(null, 
-                "Error al crear rol: " + e.getMessage(),
+                "Error de base de datos al crear rol: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+            return false;
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(null, 
+                "Error: datos inválidos al crear rol: " + e.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
@@ -109,8 +117,10 @@ public class ControladorRolesAvanzados {
                 return rolPersonalizado;
             }
             
-        } catch (Exception e) {
-            System.err.println("Error al obtener rol personalizado: " + e.getMessage());
+        } catch (MongoException e) {
+            System.err.println("Error de base de datos al obtener rol personalizado: " + e.getMessage());
+        } catch (ClassCastException e) {
+            System.err.println("Error de tipo de dato al obtener rol personalizado: " + e.getMessage());
         }
         
         return null;
@@ -175,8 +185,10 @@ public class ControladorRolesAvanzados {
             for (Document doc : collection.find(eq("activo", true))) {
                 roles.add(doc.getString("nombre"));
             }
-        } catch (Exception e) {
-            System.err.println("Error al cargar roles personalizados: " + e.getMessage());
+        } catch (MongoException e) {
+            System.err.println("Error de base de datos al cargar roles personalizados: " + e.getMessage());
+        } catch (NullPointerException e) {
+            System.err.println("Error: datos nulos al cargar roles personalizados: " + e.getMessage());
         }
         
         return roles;
@@ -201,8 +213,8 @@ public class ControladorRolesAvanzados {
             
             return rol.tienePermiso(permiso);
             
-        } catch (Exception e) {
-            System.err.println("Error al verificar permiso: " + e.getMessage());
+        } catch (NullPointerException e) {
+            System.err.println("Error: datos nulos al verificar permiso: " + e.getMessage());
             return false;
         }
     }
@@ -255,9 +267,16 @@ public class ControladorRolesAvanzados {
             
             return true;
             
-        } catch (Exception e) {
+        } catch (MongoException e) {
             JOptionPane.showMessageDialog(null, 
-                "Error al editar rol: " + e.getMessage(),
+                "Error de base de datos al editar rol: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+            return false;
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(null, 
+                "Error: datos inválidos al editar rol: " + e.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
@@ -304,9 +323,9 @@ public class ControladorRolesAvanzados {
             
             return true;
             
-        } catch (Exception e) {
+        } catch (MongoException e) {
             JOptionPane.showMessageDialog(null, 
-                "Error al eliminar rol: " + e.getMessage(),
+                "Error de base de datos al eliminar rol: " + e.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
@@ -329,8 +348,8 @@ public class ControladorRolesAvanzados {
             
             return true;
             
-        } catch (Exception e) {
-            System.err.println("Error al cambiar estado del rol: " + e.getMessage());
+        } catch (MongoException e) {
+            System.err.println("Error de base de datos al cambiar estado del rol: " + e.getMessage());
             return false;
         }
     }
@@ -352,13 +371,16 @@ public class ControladorRolesAvanzados {
             if (rolDoc != null) {
                 return rolDoc.getBoolean("activo", true);
             }
-        } catch (Exception e) {
-            System.err.println("Error al verificar estado del rol: " + e.getMessage());
+        } catch (MongoException e) {
+            System.err.println("Error de base de datos al verificar estado del rol: " + e.getMessage());
+        } catch (NullPointerException e) {
+            System.err.println("Error: datos nulos al verificar estado del rol: " + e.getMessage());
         }
         
         return false;
     }
+    
     public void setVisible(boolean b) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 }
